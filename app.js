@@ -1,12 +1,15 @@
 const express = require("express");
 const itemsRoutes = require("./routes/itemsRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
 // To accept JSON data from postman
 app.use(express.json());
 
+// APIs to all different routes
 app.use("/items", itemsRoutes);
+app.use("/users", userRoutes);
 
 // Error handling middleware for appError
 app.use((err, req, res, next) => {

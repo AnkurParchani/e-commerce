@@ -45,11 +45,13 @@ exports.postItem = async (req, res) => {
   }
 };
 
-exports.deleteItem = async (req, res, next) => {
+exports.updateOne = async (req, res, next) => {
   try {
-    const item = await Item.findOneAndDelete(req.params.itemId);
+    const item = await Item.findByIdAndUpdate(req.params.itemId, req.body, {
+      new: true,
+    });
 
-    if (!item) return next(new AppError(404, "No Item found with this ID"));
+    if (!item) return next(new AppError(404, "No item found with this ID"));
 
     res.status(200).json({
       status: "success",
@@ -60,13 +62,11 @@ exports.deleteItem = async (req, res, next) => {
   }
 };
 
-exports.updateOne = async (req, res, next) => {
+exports.deleteItem = async (req, res, next) => {
   try {
-    const item = await Item.findByIdAndUpdate(req.params.itemId, req.body, {
-      new: true,
-    });
+    const item = await Item.findOneAndDelete(req.params.itemId);
 
-    if (!item) return next(new AppError(404, "No item found with this ID"));
+    if (!item) return next(new AppError(404, "No Item found with this ID"));
 
     res.status(200).json({
       status: "success",
