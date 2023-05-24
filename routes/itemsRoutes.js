@@ -9,6 +9,10 @@ router
   .get(itemsController.getAllItems)
   .post(itemsController.postItem);
 
-router.route("/:itemId").get(itemsController.getItem);
+router
+  .route("/:itemId")
+  .get(itemsController.getItem)
+  .delete(itemsController.deleteItem)
+  .patch(itemsController.updateOne);
 
 module.exports = router;
