@@ -32,19 +32,6 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
-exports.postUser = async (req, res) => {
-  try {
-    const user = await User.create(req.body);
-
-    res.status(200).json({
-      status: "success",
-      user,
-    });
-  } catch (err) {
-    console.log("Error from post user", err);
-  }
-};
-
 exports.updateOne = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.userId, req.body, {
