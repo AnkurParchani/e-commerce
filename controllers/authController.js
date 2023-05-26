@@ -55,28 +55,29 @@ exports.protect = async (req, res, next) => {
 
   if (!token) return next(new AppError(401, "User unauthorized"));
 
-  //   Decoding the jwt token
-  const decode = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  try {
+    //   Decoding the jwt token
+    const decode = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-  // Checking if the token has expired or not
-  if (Math.floor(Date.now() / 1000) > decode.exp) {
-    return next(
-      new AppError(401, "your session has expired, kindly login again.")
-    );
+    //   Getting the user from the decoded Id
+    req.user = await User.findOne({ _id: decode.userId });
+
+    if (!req.user)
+      return next(
+        new AppError(
+          500,
+          "Something went wrong with the token, please try again later. Error coming from authController.protect"
+        )
+      );
+
+    next();
+  } catch (err) {
+    if (err instanceof jwt.JsonWebTokenError) {
+      return next(new AppError(401, "Token expired, login again"));
+    } else {
+      console.log("authController.protect error");
+    }
   }
-
-  //   Getting the user from the decoded Id
-  req.user = await User.findOne({ _id: decode.userId });
-
-  if (!req.user)
-    return next(
-      new AppError(
-        500,
-        "Something went wrong with the token, please try again later. Error coming from authController.protect"
-      )
-    );
-
-  next();
 };
 
 exports.checkIsAdmin = async (req, res, next) => {
