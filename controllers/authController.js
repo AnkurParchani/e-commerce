@@ -59,7 +59,7 @@ exports.protect = async (req, res, next) => {
   const decode = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
   //   Getting the user from the decoded Id
-  req.user = await User.findById(decode.userId);
+  req.user = await User.findOne({ _id: decode.userId });
 
   if (!req.user)
     return next(
@@ -73,6 +73,16 @@ exports.protect = async (req, res, next) => {
 };
 
 exports.checkIsAdmin = async (req, res, next) => {
-  // req.user contains the current loggedIn user Id
-  // if(req.user._id === process.env.ADMIN_ID && req.user.)
+  // Converting objectId to string because mongoose returns id in new object form and id is saved in string format in process.env.
+  if (
+    req.user._id.toHexString() === process.env.ADMIN_ID &&
+    req.user.password === process.env.ADMIN_PASSWORD
+  ) {
+    // Means the user is Admin
+    next();
+  } else {
+    return next(
+      new AppError(401, "You're unauthorized to perform this action!")
+    );
+  }
 };

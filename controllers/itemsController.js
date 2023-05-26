@@ -64,7 +64,7 @@ exports.updateOne = async (req, res, next) => {
 
 exports.deleteItem = async (req, res, next) => {
   try {
-    const item = await Item.findOneAndDelete(req.params.itemId);
+    const item = await Item.findOneAndDelete({ _id: req.params.itemId });
 
     if (!item) return next(new AppError(404, "No Item found with this ID"));
 
