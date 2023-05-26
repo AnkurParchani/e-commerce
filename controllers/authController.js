@@ -58,6 +58,13 @@ exports.protect = async (req, res, next) => {
   //   Decoding the jwt token
   const decode = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
+  // Checking if the token has expired or not
+  if (Math.floor(Date.now() / 1000) > decode.exp) {
+    return next(
+      new AppError(401, "your session has expired, kindly login again.")
+    );
+  }
+
   //   Getting the user from the decoded Id
   req.user = await User.findOne({ _id: decode.userId });
 

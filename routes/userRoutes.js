@@ -5,11 +5,13 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-router.route("/").get(userController.getAllUsers);
-
 router.route("/signup").post(authController.signup);
 router.route("/login").get(authController.login);
 
+// Checking for both if the user has token and if he is admin
+router.use(authController.protect, authController.checkIsAdmin);
+
+router.route("/").get(userController.getAllUsers);
 router
   .route("/:userId")
   .get(userController.getUser)
