@@ -4,17 +4,16 @@ const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
+router.use(authController.protect);
+
 router
   .route("/")
-  .get(
-    authController.protect,
-    authController.checkIsAdmin,
-    reviewController.getAllReviews
-  )
-  .post(authController.protect, reviewController.createReview);
+  .get(authController.checkIsAdmin, reviewController.getAllReviews)
+  .post(reviewController.createReview);
 
 router
   .route("/:reviewId")
-  .delete(authController.protect, reviewController.deleteReview);
+  .delete(reviewController.deleteReview)
+  .get(authController.checkIsAdmin, reviewController.getOne);
 
 module.exports = router;

@@ -1,6 +1,45 @@
 const Review = require("../models/reviewModel");
 const AppError = require("../utils/appError");
 
+// Checking if the user is doing his action and not of any other user.
+function checkCurrentUser(userId, actionUserId, next) {
+  return new Promise((resolve, reject) => {
+    if (userId !== actionUserId) {
+      reject(
+        next(new AppError(401, "You are not authorized to do this action"))
+      );
+    } else {
+      resolve();
+    }
+  });
+}
+
+// HTTP Methods
+exports.getAllReviews = async (req, res, next) => {
+  try {
+    const reviews = await Review.find();
+
+    if (reviews.length === 0)
+      return next(new AppError(404, "No reviews found."));
+
+    res.status(200).json({ status: "success", reviews });
+  } catch (err) {
+    console.log("Error from review Controller", err);
+  }
+};
+
+exports.getOne = async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.reviewId);
+
+    if (!review) return next(new AppError(404, "No review found with this ID"));
+
+    res.status(200).json({ status: "success", review });
+  } catch (err) {
+    console.log("Error from reviewController getOne", err);
+  }
+};
+
 exports.createReview = async (req, res, next) => {
   try {
     // Getting the necessary details
@@ -22,19 +61,6 @@ exports.createReview = async (req, res, next) => {
   }
 };
 
-exports.getAllReviews = async (req, res, next) => {
-  try {
-    const reviews = await Review.find();
-
-    if (reviews.length === 0)
-      return next(new AppError(404, "No reviews found."));
-
-    res.status(200).json({ status: "success", reviews });
-  } catch (err) {
-    console.log("Error from review Controller", err);
-  }
-};
-
 exports.deleteReview = async (req, res, next) => {
   try {
     const review = await Review.findById(req.params.reviewId);
@@ -42,10 +68,11 @@ exports.deleteReview = async (req, res, next) => {
     if (!review) return next(new AppError(404, "No review found with this ID"));
 
     // Checking if the review belongs to the currently logged in user
-    if (review.user.toHexString() !== req.user._id.toHexString())
-      return next(
-        new AppError(401, "You don't have permission to do this action")
-      );
+    await checkCurrentUser(
+      review.user.toHexString(),
+      req.user._id.toHexString(),
+      next
+    );
 
     await Review.deleteOne({ _id: req.params.reviewId });
 
