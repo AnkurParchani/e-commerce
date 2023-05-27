@@ -5,7 +5,12 @@ const AppError = require("../utils/appError");
 exports.signup = async (req, res, next) => {
   try {
     // Signing in the user
-    const user = await User.create(req.body);
+    const user = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
+    });
 
     // Creating the token for the user
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
@@ -17,7 +22,12 @@ exports.signup = async (req, res, next) => {
       token,
     });
   } catch (err) {
-    console.log("Error from post user", err);
+    // Handling for duplicate email
+    if (err.code === 11000) {
+      return next(new AppError(400, "Email already exists"));
+    } else {
+      console.log("Error from post user", err);
+    }
   }
 };
 
@@ -81,16 +91,11 @@ exports.protect = async (req, res, next) => {
 };
 
 exports.checkIsAdmin = async (req, res, next) => {
-  // Converting objectId to string because mongoose returns id in new object form and id is saved in string format in process.env.
-  if (
-    req.user._id.toHexString() === process.env.ADMIN_ID &&
-    req.user.password === process.env.ADMIN_PASSWORD
-  ) {
-    // Means the user is Admin
+  if (req.user.role === "admin") {
     next();
   } else {
     return next(
-      new AppError(401, "You're unauthorized to perform this action!")
+      new AppError(401, "You're unauthorized to perform this action.")
     );
   }
 };
