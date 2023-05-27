@@ -30,20 +30,21 @@ exports.getAllAddress = async (req, res, next) => {
 
 exports.getOneAddress = async (req, res, next) => {
   try {
+    // Finding the address
     const address = await Address.findById(req.params.addressId);
 
+    // If No address found
     if (!address)
       return next(new AppError(404, "No address found with this ID"));
 
+    // Checking if the address belongs to the currently logged in user
     await checkCurrentUser(
       address.user.toHexString(),
       req.user._id.toHexString(),
       next
     );
 
-    if (!address)
-      return next(new AppError(404, "No address found with this ID"));
-
+    // Sending the response
     res.status(200).json({ status: "success", address });
   } catch (err) {
     console.log("getOneAddress", err);
@@ -73,31 +74,57 @@ exports.addAddress = async (req, res, next) => {
 };
 
 exports.updateAddress = async (req, res, next) => {
-  const address = await Address.findByIdAndUpdate(req.params.addressId);
+  try {
+    // Finding the address
+    const address = await Address.findById(req.params.addressId);
 
-  if (!address) return next(new AppError(404, "No address found with this ID"));
+    // If there's no address
+    if (!address)
+      return next(new AppError(404, "No address found with this ID"));
 
-  await checkCurrentUser(
-    address.user.toHexString(),
-    req.user._id.toHexString(),
-    next
-  );
+    // Checking if the address belongs to the currently logged in user
+    await checkCurrentUser(
+      address.user.toHexString(),
+      req.user._id.toHexString(),
+      next
+    );
 
-  res.status(200).json({ status: "success", address });
+    // Updating the address
+    const updatedAddress = await Address.findByIdAndUpdate(
+      req.params.addressId,
+      req.body,
+      { new: true }
+    );
+
+    // Sending the response
+    res.status(200).json({ status: "success", updatedAddress });
+  } catch (err) {
+    console.log("Error from updateAddress", err);
+  }
 };
 
 exports.deleteAddress = async (req, res, next) => {
-  const address = await Address.findById(req.params.addressId);
+  try {
+    // Finding the address
+    const address = await Address.findById(req.params.addressId);
 
-  if (!address) return next(new AppError(404, "No address found with this ID"));
+    // If no address found
+    if (!address)
+      return next(new AppError(404, "No address found with this ID"));
 
-  await checkCurrentUser(
-    address.user.toHexString(),
-    req.user._id.toHexString(),
-    next
-  );
+    // Cheking if the address found belongs to the currently logged in user
+    await checkCurrentUser(
+      address.user.toHexString(),
+      req.user._id.toHexString(),
+      next
+    );
 
-  await Address.findByIdAndDelete(req.params.addressId);
+    // Deleting the address
+    await Address.findByIdAndDelete(req.params.addressId);
 
-  res.status(204).json({ status: "success", deletedAddress: address });
+    // Response
+    res.status(204).json({ status: "success" });
+  } catch (err) {
+    console.log("deleteAddress function", err);
+  }
 };
