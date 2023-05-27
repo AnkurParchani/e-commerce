@@ -3,6 +3,7 @@ const itemsRoutes = require("./routes/itemsRoutes");
 const userRoutes = require("./routes/userRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const addressRoutes = require("./routes/addressRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 // APIs to all different routes
 app.use("/items", itemsRoutes);
 app.use("/users", userRoutes);
+app.use("/orders", orderRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/address", addressRoutes);
 
