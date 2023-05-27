@@ -13,6 +13,7 @@ router
 
 router
   .route("/:addressId")
+  .patch(addressController.updateAddress)
   .get(addressController.getOneAddress)
   .delete(addressController.deleteAddress);
 

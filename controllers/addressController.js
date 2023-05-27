@@ -1,12 +1,12 @@
 const Address = require("./../models/addressModel");
-const appError = require("./../utils/appError");
+const AppError = require("./../utils/appError");
 
 // Checking if the user is doing his action and not of any other user.
 function checkCurrentUser(userId, actionUserId, next) {
   return new Promise((resolve, reject) => {
     if (userId !== actionUserId) {
       reject(
-        next(new appError(401, "You are not authorized to do this action"))
+        next(new AppError(401, "You are not authorized to do this action"))
       );
     } else {
       resolve();
@@ -18,6 +18,10 @@ function checkCurrentUser(userId, actionUserId, next) {
 exports.getAllAddress = async (req, res, next) => {
   try {
     const address = await Address.find();
+
+    if (address.length === 0)
+      return next(new AppError(400, "No address present"));
+
     res.status(200).json({ status: "success", address });
   } catch (err) {
     console.log("getAllAddress method", err);
@@ -29,7 +33,7 @@ exports.getOneAddress = async (req, res, next) => {
     const address = await Address.findById(req.params.addressId);
 
     if (!address)
-      return next(new appError(404, "No address found with this ID"));
+      return next(new AppError(404, "No address found with this ID"));
 
     await checkCurrentUser(
       address.user.toHexString(),
@@ -38,7 +42,7 @@ exports.getOneAddress = async (req, res, next) => {
     );
 
     if (!address)
-      return next(new appError(404, "No address found with this ID"));
+      return next(new AppError(404, "No address found with this ID"));
 
     res.status(200).json({ status: "success", address });
   } catch (err) {
@@ -55,7 +59,7 @@ exports.addAddress = async (req, res, next) => {
     !req.body.fullName ||
     !req.body.city
   )
-    return next(new appError(400, "Please provide all the necessary details"));
+    return next(new AppError(400, "Please provide all the necessary details"));
 
   // Adding the currently logged in user id to the address
   req.body.user = req.user._id;
@@ -68,10 +72,24 @@ exports.addAddress = async (req, res, next) => {
   });
 };
 
+exports.updateAddress = async (req, res, next) => {
+  const address = await Address.findByIdAndUpdate(req.params.addressId);
+
+  if (!address) return next(new AppError(404, "No address found with this ID"));
+
+  await checkCurrentUser(
+    address.user.toHexString(),
+    req.user._id.toHexString(),
+    next
+  );
+
+  res.status(200).json({ status: "success", address });
+};
+
 exports.deleteAddress = async (req, res, next) => {
   const address = await Address.findById(req.params.addressId);
 
-  if (!address) return next(new appError(404, "No address found with this ID"));
+  if (!address) return next(new AppError(404, "No address found with this ID"));
 
   await checkCurrentUser(
     address.user.toHexString(),
