@@ -11,6 +11,10 @@ router
     authController.checkIsAdmin,
     reviewController.getAllReviews
   )
-  .post(reviewController.createReview);
+  .post(authController.protect, reviewController.createReview);
+
+router
+  .route("/:reviewId")
+  .delete(authController.protect, reviewController.deleteReview);
 
 module.exports = router;
