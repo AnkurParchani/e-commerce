@@ -53,6 +53,9 @@ userSchema.methods.checkCredentials = async (userPassword, dbPassword) => {
   return await bcrypt.compare(userPassword, dbPassword);
 };
 
+// Creating Index for emails
+userSchema.index({ email: 1 }, { unique: true });
+
 // Creating Model
 const User = mongoose.model("User", userSchema);
 

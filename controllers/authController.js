@@ -25,8 +25,12 @@ exports.signup = async (req, res, next) => {
     // Handling for duplicate email
     if (err.code === 11000) {
       return next(new AppError(400, "Email already exists"));
+
+      // Validation error for password !== confirmPassword
+    } else if (err.name === "ValidationError") {
+      return next(new AppError(400, "Passwords don't match! Try again."));
     } else {
-      console.log("Error from post user", err);
+      console.log("Error from signup", err);
     }
   }
 };
