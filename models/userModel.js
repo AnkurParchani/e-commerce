@@ -4,22 +4,22 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, "Please tell us your name"],
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
+    required: [true, "Please provide email"],
+    unique: [true, "This email has already been used by someone else"],
     dropDubs: true,
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "Please enter password"],
     select: false,
   },
   passwordConfirm: {
     type: String,
-    required: true,
+    required: [true, "Please confirm your password"],
     validate: {
       validator: function (val) {
         return val === this.password;

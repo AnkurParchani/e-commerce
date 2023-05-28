@@ -1,15 +1,26 @@
 const AppError = require("../utils/appError");
 const Item = require("../models/itemsModel");
+const ApiFeatures = require("../utils/apiFeatures");
+const filterQuery = require("../utils/filterQuery");
 
+// HTTP Methods
 exports.getAllItems = async (req, res, next) => {
   try {
-    const items = await Item.find();
+    // API FEATURES
+    const features = new ApiFeatures(Item.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .pagination();
+
+    const items = await features.query;
 
     if (items.length === 0)
       return next(new AppError(404, "No items found in the list"));
 
     res.status(200).json({
       status: "success",
+      result: items.length,
       items,
     });
   } catch (err) {
