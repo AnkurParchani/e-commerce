@@ -39,11 +39,14 @@ exports.login = async (req, res, next) => {
   // Finding the user with the provided credentials
   const user = await User.findOne({
     email: req.body.email,
-    password: req.body.password,
-  });
+  }).select("+password");
 
-  //   If no user is found
-  if (!user) return next(new AppError(401, "Incorrect email or password"));
+  // Checking password
+  const correct =
+    user && (await user.checkCredentials(req.body.password, user.password));
+
+  //   If user is not found OR password does not match
+  if (!correct) return next(new AppError(401, "Incorrect email or password"));
 
   //   If the user is found then making token for the logged in user
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {

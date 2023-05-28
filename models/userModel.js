@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -14,6 +15,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -29,18 +31,29 @@ const userSchema = new mongoose.Schema({
   role: { type: String, default: "user" },
 });
 
-userSchema.pre("save", function () {
-  this.passwordConfirm = undefined;
-
+// Pre-save middleware
+userSchema.pre("save", async function () {
   // Making user admin if credentials match
   if (
-    this.password === process.env.ADMIN_PASSWORD &&
-    this.email === process.env.ADMIN_EMAIL
+    this.email === process.env.ADMIN_EMAIL &&
+    (await bcrypt.compare(this.password, process.env.ADMIN_PASSWORD))
   ) {
     this.role = "admin";
   }
+
+  // Encrypting password
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // Removing passwordConfirm
+  this.passwordConfirm = undefined;
 });
 
+// Instance method
+userSchema.methods.checkCredentials = async (userPassword, dbPassword) => {
+  return await bcrypt.compare(userPassword, dbPassword);
+};
+
+// Creating Model
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
