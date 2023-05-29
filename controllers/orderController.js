@@ -1,5 +1,6 @@
 const AppError = require("./../utils/appError");
 const Order = require("./../models/orderModel");
+const ApiFeatures = require("./../utils/apiFeatures");
 
 // Checking if the user is doing his action and not of any other user.
 function checkCurrentUser(userId, actionUserId, next) {
@@ -17,12 +18,21 @@ function checkCurrentUser(userId, actionUserId, next) {
 // HTTP Methods
 exports.getAllOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find();
+    // Implementing API Features
+    const features = new ApiFeatures(Order.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .pagination();
 
-    if (!orders) return next(new AppError(404, "Orders list empty"));
+    const orders = await features.query;
+
+    if (orders.length === 0)
+      return next(new AppError(404, "Orders list empty"));
 
     res.status(200).json({
       status: "success",
+      results: orders.length,
       orders,
     });
   } catch (err) {

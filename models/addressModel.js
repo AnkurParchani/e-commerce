@@ -5,7 +5,10 @@ const AppError = require("../utils/appError");
 const addressSchema = new mongoose.Schema({
   country: String,
   fullName: String,
-  phoneNumber: { type: Number, unique: true },
+  phoneNumber: {
+    type: Number,
+    unique: [true, "Phone number is already in use"],
+  },
   area: String,
   landmark: String,
   city: String,

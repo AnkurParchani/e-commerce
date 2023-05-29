@@ -1,5 +1,6 @@
 const Review = require("../models/reviewModel");
 const AppError = require("../utils/appError");
+const ApiFeatures = require("./../utils/apiFeatures");
 
 // Checking if the user is doing his action and not of any other user.
 function checkCurrentUser(userId, actionUserId, next) {
@@ -17,12 +18,20 @@ function checkCurrentUser(userId, actionUserId, next) {
 // HTTP Methods
 exports.getAllReviews = async (req, res, next) => {
   try {
-    const reviews = await Review.find();
+    const features = new ApiFeatures(Review.find(), req.query)
+      .filter()
+      .sort()
+      .pagination()
+      .limitFields();
+
+    const reviews = await features.query;
 
     if (reviews.length === 0)
       return next(new AppError(404, "No reviews found."));
 
-    res.status(200).json({ status: "success", reviews });
+    res
+      .status(200)
+      .json({ status: "success", results: reviews.length, reviews });
   } catch (err) {
     console.log("Error from review Controller", err);
   }

@@ -1,14 +1,22 @@
 const User = require("../models/userModel");
 const AppError = require("../utils/appError");
+const ApiFeatures = require("./../utils/apiFeatures");
 
 exports.getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const features = new ApiFeatures(User.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .pagination();
+
+    const users = await features.query;
 
     if (users.length === 0)
       return next(new AppError(404, "No users found in the list"));
 
     res.status(200).json({
+      results: users.length,
       status: "success",
       users,
     });
