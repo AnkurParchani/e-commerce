@@ -4,6 +4,7 @@ const userRoutes = require("./routes/userRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const wishListRoutes = require("./routes/wishListRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use("/users", userRoutes);
 app.use("/orders", orderRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/address", addressRoutes);
+app.use("/wishlist", wishListRoutes);
 
 // Error handling middleware for appError
 app.use((err, req, res, next) => {

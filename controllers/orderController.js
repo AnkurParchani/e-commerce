@@ -62,13 +62,15 @@ exports.createOrder = async (req, res, next) => {
 
 exports.getOrder = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.orderId);
+    const order = await Order.findById(req.params.orderId).populate({
+      path: "user",
+    });
 
     if (!order) return next(new AppError(404, "No order found with this ID"));
 
     // Checking if the order is of currently logged in user
     await checkCurrentUser(
-      order.user.toHexString(),
+      order.user._id.toHexString(),
       req.user._id.toHexString(),
       next
     );
