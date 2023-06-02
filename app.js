@@ -1,4 +1,6 @@
 const express = require("express");
+const cors = require("cors");
+
 const itemsRoutes = require("./routes/itemsRoutes");
 const userRoutes = require("./routes/userRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
@@ -7,6 +9,9 @@ const orderRoutes = require("./routes/orderRoutes");
 const wishListRoutes = require("./routes/wishListRoutes");
 
 const app = express();
+
+// Important packages
+app.use(cors());
 
 // To accept JSON data from postman
 app.use(express.json());

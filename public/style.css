@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Lobster&display=swap");
+
+body {
+  font-family: Inter, sans-serif !important;
+  background-color: rgb(227, 232, 241);
+}
+/* Navigation Bar */
+.brandName {
+  font-family: lobster, Inter, sans-serif !important;
+  font-size: 22px !important;
+  letter-spacing: 2px;
+}
+.navbar {
+  padding: 4px 0px !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.searchInputForm {
+  display: flex;
+  flex-grow: 3;
+  justify-content: center;
+  align-items: center;
+}
+.searchInputForm input {
+  max-width: 450px;
+  border: none;
+  padding: 3px 7px;
+  border-radius: 10px 0px 0px 10px;
+  width: 100%;
+}
+.searchInputForm input:focus {
+  outline: none;
+}
+.searchInputForm button {
+  background-color: #7700ff;
+  border-radius: 0px 7px 7px 0px;
+  color: white;
+  height: 30px;
+  padding: 0px 20px;
+  border: none;
+}
+.nav__links a {
+  margin-right: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: #d7d7d7;
+}
+.nav__links a:hover {
+  color: #777777;
+  transition: all 0.1s;
+}
+.navFaIcon {
+  margin-right: 5px;
+}
+.navbarHamburger {
+  margin-left: 20px;
+}
